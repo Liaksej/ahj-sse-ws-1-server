@@ -1,0 +1,28 @@
+{
+  "name": "ahj-sse-ws-1-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Liaksej",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "serve": "localhost:8081",
+    "lint": "eslint . "
+  },
+  "devDependencies": {
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jest": "^27.2.2",
+    "eslint-plugin-prettier": "^5.0.0",
+    "live-server": "^1.2.2",
+    "open": "^9.1.0",
+    "prettier": "3.0.1"
+  },
+  "dependencies": {
+    "@koa/cors": "^4.0.0",
+    "koa": "^2.14.2",
+    "koa-bodyparser": "^4.4.1",
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
+  }
+}
