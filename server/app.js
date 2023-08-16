@@ -138,19 +138,47 @@ const wsServer = new WS.Server({
   server,
 });
 
+const users = [];
 const chat = ["Hello from WebSocket server!"];
 
 wsServer.on("connection", (ws) => {
   ws.on("message", (event) => {
-    chat.push(`${event}`);
-    const eventData = JSON.stringify({ chat: [`${event}`] });
-    Array.from(wsServer.clients)
-      .filter((client) => client.readyState === WS.OPEN)
-      .forEach((client) => {
-        client.send(eventData);
-      });
+    const data = JSON.parse(event);
+    switch (data.type) {
+      case "new-user":
+        console.log(`${data.username}`);
+        if (!users.includes(data.username)) {
+          users.push(data.username);
+          const accessAllowed = {
+            type: "new-user-response",
+            success: "allowed",
+            username: data.username,
+          };
+          ws.send(JSON.stringify(accessAllowed));
+          ws.send(JSON.stringify({ type: "message", chat }));
+          // Array.from(wsServer.clients)
+          //   .filter((client) => client.readyState === WS.OPEN)
+          //   .forEach((client) => {
+          //     client.send(eventData);
+          //   });
+        }
+        break;
+      case "message":
+        if (data) {
+          chat.push(`${event}`);
+          const eventData = JSON.stringify({ chat: [`${event}`] });
+          Array.from(wsServer.clients)
+            .filter((client) => client.readyState === WS.OPEN)
+            .forEach((client) => {
+              client.send(eventData);
+            });
+        }
+        break;
+      default:
+        console.log("404");
+        break;
+    }
   });
-  ws.send(JSON.stringify({ chat }));
 });
 
 server.listen(8081, () => {
