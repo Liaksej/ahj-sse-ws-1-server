@@ -138,14 +138,19 @@ const wsServer = new WS.Server({
   server,
 });
 
-// const chat = [];
+const chat = ["Hello from WebSocket server!"];
 
 wsServer.on("connection", (ws) => {
-  ws.on("message", (message) => {
-    console.log("Received: ", message);
+  ws.on("message", (event) => {
+    chat.push(`${event}`);
+    const eventData = JSON.stringify({ chat: [`${event}`] });
+    Array.from(wsServer.clients)
+      .filter((client) => client.readyState === WS.OPEN)
+      .forEach((client) => {
+        client.send(eventData);
+      });
   });
-
-  ws.send("Hello from WebSocket");
+  ws.send(JSON.stringify({ chat }));
 });
 
 server.listen(8081, () => {
