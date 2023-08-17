@@ -30,7 +30,7 @@ const wsServer = new WS.Server({
   server,
 });
 
-const users = [];
+let users = [];
 const chat = ["Hello from WebSocket server!"];
 
 wsServer.on("connection", (ws) => {
@@ -44,11 +44,34 @@ wsServer.on("connection", (ws) => {
           ws.send(
             JSON.stringify(new UserResponse("allowed", data.username, users)),
           );
+          Array.from(wsServer.clients)
+            .filter((client) => client.readyState === WS.OPEN)
+            .forEach((client) => {
+              client.send(
+                JSON.stringify(
+                  new UserResponse("incoming-user", data.username),
+                ),
+              );
+            });
 
           ws.send(JSON.stringify({ type: "message", chat: chat }));
         } else {
           ws.send(JSON.stringify(new UserResponse("denied", data.username)));
         }
+        break;
+      case "outgoing-user":
+        if (users.includes(data.username)) {
+          users = users.filter((user) => {
+            return user !== data.username;
+          });
+        }
+        Array.from(wsServer.clients)
+          .filter((client) => client.readyState === WS.OPEN)
+          .forEach((client) => {
+            client.send(
+              JSON.stringify(new UserResponse("outgoing-user", data.username)),
+            );
+          });
         break;
       case "message":
         if (data) {
