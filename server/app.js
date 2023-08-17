@@ -146,7 +146,6 @@ wsServer.on("connection", (ws) => {
     const data = JSON.parse(event);
     switch (data.type) {
       case "new-user":
-        console.log(`${data.username}`);
         if (!users.includes(data.username)) {
           users.push(data.username);
           const accessAllowed = {
@@ -155,18 +154,16 @@ wsServer.on("connection", (ws) => {
             username: data.username,
           };
           ws.send(JSON.stringify(accessAllowed));
-          ws.send(JSON.stringify({ type: "message", chat }));
-          // Array.from(wsServer.clients)
-          //   .filter((client) => client.readyState === WS.OPEN)
-          //   .forEach((client) => {
-          //     client.send(eventData);
-          //   });
+          ws.send(JSON.stringify({ type: "message", chat: chat }));
         }
         break;
       case "message":
         if (data) {
-          chat.push(`${event}`);
-          const eventData = JSON.stringify({ chat: [`${event}`] });
+          chat.push(data.message);
+          const eventData = JSON.stringify({
+            type: "message",
+            chat: [data.message],
+          });
           Array.from(wsServer.clients)
             .filter((client) => client.readyState === WS.OPEN)
             .forEach((client) => {
