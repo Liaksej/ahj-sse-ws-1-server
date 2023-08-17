@@ -101,6 +101,14 @@ wsServer.on("connection", (ws) => {
   });
   ws.on("close", () => {
     users = users.filter((user) => user !== ws.username);
+
+    Array.from(wsServer.clients)
+      .filter((client) => client.readyState === WS.OPEN)
+      .forEach((client) => {
+        client.send(
+          JSON.stringify(new UserResponse("outgoing-user", ws.username)),
+        );
+      });
   });
 });
 
