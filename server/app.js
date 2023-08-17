@@ -107,9 +107,16 @@ wsServer.on("connection", (ws) => {
 setInterval(function ping() {
   wsServer.clients.forEach((ws) => {
     if (ws.isAlive === false) {
+      Array.from(wsServer.clients)
+        .filter((client) => client.readyState === WS.OPEN)
+        .forEach((client) => {
+          client.send(
+            JSON.stringify(new UserResponse("outgoing-user", ws.username)),
+          );
+        });
+
       return ws.terminate();
     }
-
     ws.isAlive = false;
     ws.ping(function noop() {});
   });
