@@ -97,8 +97,6 @@ wsServer.on("connection", (ws) => {
   });
 });
 
-server.listen(8081, () => {
-  console.log("Server is running on http://localhost:8081");
-});
+server.listen(80);
 
-app.listen(8082);
+app.listen(80);
