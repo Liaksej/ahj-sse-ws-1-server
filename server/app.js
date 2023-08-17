@@ -99,4 +99,4 @@ wsServer.on("connection", (ws) => {
 
 server.listen(80);
 
-app.listen(80);
+app.listen(443);
