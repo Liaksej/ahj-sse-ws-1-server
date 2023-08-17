@@ -45,6 +45,7 @@ wsServer.on("connection", (ws) => {
       case "new-user":
         if (!users.includes(data.username)) {
           users.push(data.username);
+          ws.username = data.username;
 
           ws.send(
             JSON.stringify(new UserResponse("allowed", data.username, users)),
@@ -99,7 +100,6 @@ wsServer.on("connection", (ws) => {
     }
   });
   ws.on("close", () => {
-    // Удаление пользователя при отключении
     users = users.filter((user) => user !== ws.username);
   });
 });
@@ -107,7 +107,6 @@ wsServer.on("connection", (ws) => {
 setInterval(function ping() {
   wsServer.clients.forEach((ws) => {
     if (ws.isAlive === false) {
-      // Выполняем любые необходимые действия при потере соединения с клиентом
       return ws.terminate();
     }
 
