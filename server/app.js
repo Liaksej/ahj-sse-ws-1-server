@@ -33,7 +33,7 @@ const wsServer = new WS.Server({
 });
 
 let users = [];
-const chat = [new Message("server", "Hello from WebSocket server!")];
+const chat = [];
 
 wsServer.on("connection", (ws) => {
   ws.on("message", (event) => {
