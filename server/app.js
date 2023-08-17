@@ -36,6 +36,9 @@ let users = [];
 const chat = [];
 
 wsServer.on("connection", (ws) => {
+  ws.isAlive = true;
+  ws.on("pong", () => (ws.isAlive = true));
+
   ws.on("message", (event) => {
     const data = JSON.parse(event);
     switch (data.type) {
@@ -95,7 +98,23 @@ wsServer.on("connection", (ws) => {
         break;
     }
   });
+  ws.on("close", () => {
+    // Удаление пользователя при отключении
+    users = users.filter((user) => user !== ws.username);
+  });
 });
+
+setInterval(function ping() {
+  wsServer.clients.forEach((ws) => {
+    if (ws.isAlive === false) {
+      // Выполняем любые необходимые действия при потере соединения с клиентом
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping(function noop() {});
+  });
+}, 30000);
 
 server.listen(80);
 
