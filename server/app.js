@@ -1,8 +1,10 @@
 const Koa = require("koa");
-const cors = require("@koa/cors");
-const UserResponse = require("./modules/UserResponse");
 const WS = require("ws");
 const http = require("http");
+const cors = require("@koa/cors");
+
+const UserResponse = require("./modules/UserResponse");
+const Message = require("./modules/Message");
 
 const app = new Koa();
 app.use(cors());
@@ -31,7 +33,7 @@ const wsServer = new WS.Server({
 });
 
 let users = [];
-const chat = ["Hello from WebSocket server!"];
+const chat = [new Message("server", "Hello from WebSocket server!")];
 
 wsServer.on("connection", (ws) => {
   ws.on("message", (event) => {
@@ -75,10 +77,11 @@ wsServer.on("connection", (ws) => {
         break;
       case "message":
         if (data) {
-          chat.push(data.message);
+          const message = new Message(data.username, data.message);
+          chat.push(message);
           const eventData = JSON.stringify({
             type: "message",
-            chat: [data.message],
+            chat: [message],
           });
           Array.from(wsServer.clients)
             .filter((client) => client.readyState === WS.OPEN)
